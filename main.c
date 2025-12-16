@@ -1,3 +1,4 @@
+// gcc main.c -Wall -o main.out && ./main.out < testuni
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -34,7 +35,7 @@ const char SOK_BAS = 'b';
 const char CAISSE_BAS = 'B';
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 400000;
+const int DUREE_PAUSE = 4;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -77,7 +78,7 @@ int main(){
     printf("nbDep : %d\n",nbDep);
     system("clear");
     affiche_entete(nomNiveau, compteurDep);
-    afficher_plateau(plateau, niveau);
+    //afficher_plateau(plateau, niveau);
 
     while (compteur < nbDep){ 
         usleep(DUREE_PAUSE); // pause entre chaque mouvement
@@ -87,7 +88,7 @@ int main(){
         deplacer(deplacements, plateau, sokobanX, sokobanY, &compteur, depPossible, &compteurDep); // deplace sokoban
         system("clear");
         affiche_entete(nomNiveau, compteurDep);
-        afficher_plateau(plateau, niveau);
+        //afficher_plateau(plateau, niveau);
     }
     victoire = gagne(plateau, niveau);
     if (victoire == true){ // si la partie est gagné
