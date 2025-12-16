@@ -1,3 +1,4 @@
+// gcc main.c -Wall -o main.out && ./main.out < testuni
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
