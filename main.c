@@ -34,7 +34,7 @@ const char SOK_BAS = 'b';
 const char CAISSE_BAS = 'B';
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 400000;
+const int DUREE_PAUSE = 200000;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -111,7 +111,7 @@ void charger_partie(t_Plateau plateau, char fichier[]){
 
     f = fopen(fichier, "r");
     if (f == NULL){
-        printf("ERREUR SUR FICHIER");
+        printf("ERREUR SUR FICHIER\n");
         exit(EXIT_FAILURE);
     }
     else{
