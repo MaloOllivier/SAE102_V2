@@ -48,7 +48,7 @@ void detection_sokoban(t_Plateau plateau, int *AdrX, int *AdrY);
 bool gagne(t_Plateau plateau, t_Plateau niveau);
 bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int compteur);
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
-void detection_inutile(int compteur, int compteurDep, typeDeplacements dep, typeDepInutiles inutile)
+void detection_inutile(int compteur, int compteurDep, typeDeplacements dep, typeDepInutiles inutile);
 
 
 int main(){
@@ -59,6 +59,8 @@ int main(){
     int compteur, compteurDep, nbDep;
     int sokobanX, sokobanY;
     typeDeplacements deplacements;
+    typeDepInutiles inutile;
+
     lecture_niveau(nomNiveau);
     charger_partie(niveau, nomNiveau);
 
@@ -323,3 +325,6 @@ void chargerDeplacements(typeDeplacements t, char fichier[], int * nb){
     fclose(f);
 }
 
+void detection_inutile(int compteur, int compteurDep, typeDeplacements dep, typeDepInutiles inutile){
+
+}
