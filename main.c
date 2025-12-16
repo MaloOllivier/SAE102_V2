@@ -15,7 +15,7 @@
 // definition des tableaux
 typedef char t_Plateau[TAILLE][TAILLE];
 typedef char typeDeplacements[NB_DEPLACEMENTS];
-typedef int typeDepInutilies[NB_DEPLACEMENTS];
+typedef int typeDepInutiles[NB_DEPLACEMENTS];
 // definition des char a enregistrer / afficher
 const char SOKOBAN[1] = "@";
 const char CAISSES[1] = "$";
@@ -48,7 +48,7 @@ void detection_sokoban(t_Plateau plateau, int *AdrX, int *AdrY);
 bool gagne(t_Plateau plateau, t_Plateau niveau);
 bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int compteur);
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
-void detection_inutile(int compteur, int compteurDep, typeDeplacements dep, )
+void detection_inutile(int compteur, int compteurDep, typeDeplacements dep, typeDepInutiles inutile)
 
 
 int main(){
