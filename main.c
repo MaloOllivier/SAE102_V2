@@ -8,15 +8,11 @@
 #include <fcntl.h>
 #include <ctype.h>
 
+// tailles de tableaux
 #define TAILLE 12
 #define NB_DEPLACEMENTS 500
 
-// definition des touches
-#define HAUT 'z'
-#define BAS 's'
-#define GAUCHE 'q'
-#define DROITE 'd'
-
+// definition des tableaux
 typedef char t_Plateau[TAILLE][TAILLE];
 typedef char typeDeplacements[NB_DEPLACEMENTS];
 
@@ -36,7 +32,9 @@ const char SOK_HAUT = 'h';
 const char CAISSE_HAUT = 'H';
 const char SOK_BAS = 'b';
 const char CAISSE_BAS = 'B';
-const int DUREE_PAUSE = 200000;
+
+// temps entre chaque deplacements
+const int DUREE_PAUSE = 400000;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -75,29 +73,29 @@ int main(){
     chargerDeplacements(deplacements, nomDeplacement, &nbDep);
     printf("nbDep : %d\n",nbDep);
     system("clear");
-    affiche_entete(nomNiveau, compteur);
+    affiche_entete(nomNiveau, compteurDep);
     afficher_plateau(plateau, niveau);
 
     while (compteur < nbDep){ 
-        usleep(DUREE_PAUSE); // delay pour ne pas prendre trop de ressources
-        detection_sokoban(plateau, &sokobanX, &sokobanY);
-        depPossible = false;
-        depPossible = deplacement_possible(deplacements, plateau, sokobanX, sokobanY, compteur);
-        deplacer(deplacements, plateau, sokobanX, sokobanY, &compteur, depPossible, &compteurDep);
+        usleep(DUREE_PAUSE); // pause entre chaque mouvement
+        detection_sokoban(plateau, &sokobanX, &sokobanY); // coordonnées de sokoban
+        depPossible = false; // remets la verification de deplacement a false
+        depPossible = deplacement_possible(deplacements, plateau, sokobanX, sokobanY, compteur); // verifie que le prochain deplacement est possible
+        deplacer(deplacements, plateau, sokobanX, sokobanY, &compteur, depPossible, &compteurDep); // deplace sokoban
         system("clear");
         affiche_entete(nomNiveau, compteurDep);
         afficher_plateau(plateau, niveau);
     }
     victoire = gagne(plateau, niveau);
-    if (victoire == true){ // victoire
+    if (victoire == true){ // si la partie est gagné
         printf("---------------------------------------------------------------------------------------------------------------\n");
-        printf("La suite de déplacement %s est bien une solution de la partie pour la partie %s.\n\n", nomDeplacement, nomNiveau);
+        printf("La suite de déplacement \"%s\" est bien une solution pour la partie \"%s\".\n\n", nomDeplacement, nomNiveau);
         printf("Elle contient %d déplacements.\n", compteurDep);
         printf("---------------------------------------------------------------------------------------------------------------\n");
     }
     else{
         printf("---------------------------------------------------------------------------------------------------------------\n");
-        printf("La suite de déplacements %s N’EST PAS une solution pour la partie %s.\n", nomDeplacement, nomNiveau);
+        printf("La suite de déplacements \"%s\" N’EST PAS une solution pour la partie \"%s\" .\n", nomDeplacement, nomNiveau);
         printf("---------------------------------------------------------------------------------------------------------------\n");
     }
     return EXIT_SUCCESS;
@@ -165,13 +163,14 @@ void affiche_entete(char niveau[], int compteurDep){
     printf("Nombre de deplacements : %d \n\n\n", compteurDep);
 }
 
-bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int compteur){
+bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int compteur){ // fonction qui verifie si le prochain deplacemet est possible
     bool possible = false;
-    char dep = tolower(deplacement[compteur]);
+    char dep = tolower(deplacement[compteur]); // on passe tout les deplacements en minuscule car on verifie juste si le mouvement est possible
+    
     if (dep == SOK_HAUT && x > 0 && plateau[x - 1][y] != MURS[0]){
         if (!(plateau[x - 1][y] == CAISSES[0] &&
-              (plateau[x - 2][y] == MURS[0] || plateau[x - 2][y] == CAISSES[0]))){
-                possible = true;
+              (plateau[x - 2][y] == MURS[0] || plateau[x - 2][y] == CAISSES[0]))){ // si la prochaine case n'est pas une caisse avec un mur ou une caisse derriere
+                possible = true; // alors le deplacement est possible
         }
     }
     else if (dep == SOK_GAUCHE && y > 0 && plateau[x][y - 1] != MURS[0]){
@@ -199,11 +198,11 @@ bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x
 
 void deplacer(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int *compteur, bool possible, int *compteurDep){
     int i = *compteur;
-    if(deplacement[i] == SOK_BAS && plateau[x + 1][y] != CAISSES[0]){
-       if(possible){
-            plateau[x + 1][y] = SOKOBAN[0]; 
-            plateau[x][y] = ESPACE[0];
-            (*compteurDep)++;
+    if(deplacement[i] == SOK_BAS && plateau[x + 1][y] != CAISSES[0]){ // si le deplacement et un sokoban simple est qu'il n'y a pas de caisses derriere
+       if(possible){ // si le deplacement a été validé par deplacement_possible()
+            plateau[x + 1][y] = SOKOBAN[0]; // case d'apres = sokoban
+            plateau[x][y] = ESPACE[0]; // case d'avant = espace
+            (*compteurDep)++; // deplacements reels +1
        } 
     }
     else if(deplacement[i] == SOK_HAUT && plateau[x - 1][y] != CAISSES[0]){ 
@@ -227,11 +226,11 @@ void deplacer(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int
             (*compteurDep)++;
         }
     }
-    else if(deplacement[i] == CAISSE_BAS && plateau[x + 1][y] == CAISSES[0]){ 
-        if(possible){
-            plateau[x + 1][y] = SOKOBAN[0];
-            plateau[x][y] = ESPACE[0];
-            plateau[x + 2][y] = CAISSES[0];
+    else if(deplacement[i] == CAISSE_BAS && plateau[x + 1][y] == CAISSES[0]){ // si le deplacement est un sokoban caisse et qu'il y a bien une caisse derriere
+        if(possible){ // si le deplacement a été validé par deplacement_possible()
+            plateau[x + 1][y] = SOKOBAN[0]; // case d'apres = sokoban
+            plateau[x][y] = ESPACE[0]; // case d'avant = espace
+            plateau[x + 2][y] = CAISSES[0]; // case 2 fois apres = caisse
             (*compteurDep)++;
         }
     }
