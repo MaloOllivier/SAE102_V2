@@ -53,6 +53,7 @@ bool gagne(t_Plateau plateau, t_Plateau niveau);
 bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int compteur);
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
 void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile);
+void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]);
 
 
 int main(){
@@ -93,6 +94,7 @@ int main(){
         oldCompteurDep = compteur;
         deplacer(deplacements, plateau, sokobanX, sokobanY, &compteur, depPossible, &compteurDep); // deplace sokoban
         detection_utile(deplacements, compteur, compteurDep, oldCompteurDep, utile);
+        enregistrer_deplacements(utile, compteurDep, "FICH");
         system("clear");
         affiche_entete(nomNiveau, compteurDep);
         //afficher_plateau(plateau, niveau);
@@ -109,7 +111,7 @@ int main(){
         printf("La suite de déplacements \"%s\" N’EST PAS une solution pour la partie \"%s\" .\n", nomDeplacement, nomNiveau);
         printf("---------------------------------------------------------------------------------------------------------------\n");
     }
-    
+
     return EXIT_SUCCESS;
 }
 void lecture_niveau(char niveau[]){
@@ -338,4 +340,12 @@ void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int ol
     if(oldCompteurDep != compteurDep){
         utile[compteurDep] = dep[compteur];
     }
+}
+
+void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]){
+    FILE * f;
+
+    f = fopen(fic, "w");
+    fwrite(t,sizeof(char), nb, f);
+    fclose(f);
 }
