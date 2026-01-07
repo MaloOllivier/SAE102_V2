@@ -16,7 +16,10 @@
 // definition des tableaux
 typedef char t_Plateau[TAILLE][TAILLE];
 typedef char typeDeplacements[NB_DEPLACEMENTS];
-typedef int typeDepInutiles[NB_DEPLACEMENTS];
+typedef struct{
+    int x;
+    int y;
+} t_position;
 // definition des char a enregistrer / afficher
 const char SOKOBAN[1] = "@";
 const char CAISSES[1] = "$";
@@ -49,18 +52,19 @@ void detection_sokoban(t_Plateau plateau, int *AdrX, int *AdrY);
 bool gagne(t_Plateau plateau, t_Plateau niveau);
 bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int compteur);
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
-void detection_inutile(int compteur, int compteurDep, typeDeplacements dep, typeDepInutiles inutile);
+void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile);
 
 
 int main(){
     //declaration des variables
+    t_position positions[NB_DEPLACEMENTS];
     bool victoire = false, depPossible;
     t_Plateau plateau, niveau;
     char nomNiveau[30], nomDeplacement[30];
-    int compteur, compteurDep, nbDep;
+    int compteur, compteurDep, nbDep, oldCompteurDep;
     int sokobanX, sokobanY;
     typeDeplacements deplacements;
-    typeDepInutiles inutile;
+    typeDeplacements utile;
 
     lecture_niveau(nomNiveau);
     charger_partie(niveau, nomNiveau);
@@ -69,6 +73,7 @@ int main(){
     // remise a 0
     compteur = 0;
     compteurDep = 0;
+    oldCompteurDep = 0;
 
     // initialisation
     charger_partie(plateau, nomNiveau);
@@ -85,7 +90,9 @@ int main(){
         detection_sokoban(plateau, &sokobanX, &sokobanY); // coordonnées de sokoban
         depPossible = false; // remets la verification de deplacement a false
         depPossible = deplacement_possible(deplacements, plateau, sokobanX, sokobanY, compteur); // verifie que le prochain deplacement est possible
+        oldCompteurDep = compteur;
         deplacer(deplacements, plateau, sokobanX, sokobanY, &compteur, depPossible, &compteurDep); // deplace sokoban
+        detection_utile(deplacements, compteur, compteurDep, oldCompteurDep, utile);
         system("clear");
         affiche_entete(nomNiveau, compteurDep);
         //afficher_plateau(plateau, niveau);
@@ -102,6 +109,7 @@ int main(){
         printf("La suite de déplacements \"%s\" N’EST PAS une solution pour la partie \"%s\" .\n", nomDeplacement, nomNiveau);
         printf("---------------------------------------------------------------------------------------------------------------\n");
     }
+    
     return EXIT_SUCCESS;
 }
 void lecture_niveau(char niveau[]){
@@ -326,6 +334,8 @@ void chargerDeplacements(typeDeplacements t, char fichier[], int * nb){
     fclose(f);
 }
 
-void detection_inutile(int compteur, int compteurDep, typeDeplacements dep, typeDepInutiles inutile){
-
+void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile){
+    if(oldCompteurDep != compteurDep){
+        utile[compteurDep] = dep[compteur];
+    }
 }
