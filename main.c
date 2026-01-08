@@ -33,6 +33,7 @@ const char SOK_HAUT = 'h';
 const char CAISSE_HAUT = 'H';
 const char SOK_BAS = 'b';
 const char CAISSE_BAS = 'B';
+//5
 
 // temps entre chaque deplacements
 const int DUREE_PAUSE = 200000;
