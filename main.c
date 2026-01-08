@@ -52,8 +52,10 @@ void detection_sokoban(t_Plateau plateau, int *AdrX, int *AdrY);
 bool gagne(t_Plateau plateau, t_Plateau niveau);
 bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int compteur);
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
-void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile);
+bool detection_minuscule(char lettre);
+void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile, t_position position);
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]);
+
 
 
 int main(){
@@ -93,7 +95,10 @@ int main(){
         depPossible = deplacement_possible(deplacements, plateau, sokobanX, sokobanY, compteur); // verifie que le prochain deplacement est possible
         oldCompteurDep = compteur;
         deplacer(deplacements, plateau, sokobanX, sokobanY, &compteur, depPossible, &compteurDep); // deplace sokoban
-        detection_utile(deplacements, compteur, compteurDep, oldCompteurDep, utile);
+        detection_sokoban(plateau, &sokobanX, &sokobanY); // coordonnées de sokoban
+        positions[compteurDep].x = sokobanX;
+        positions[compteurDep].y = sokobanY;
+        detection_utile(deplacements, compteur, compteurDep, oldCompteurDep, utile, positions);
         enregistrer_deplacements(utile, compteurDep, "FICH");
         system("clear");
         affiche_entete(nomNiveau, compteurDep);
@@ -336,9 +341,25 @@ void chargerDeplacements(typeDeplacements t, char fichier[], int * nb){
     fclose(f);
 }
 
-void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile){
+bool detection_minuscule(char lettre){
+    bool minuscule = false;
+    if(lettre == SOK_BAS || lettre == SOK_DROITE){
+        minuscule = true;
+    }
+    else if(lettre == SOK_GAUCHE || lettre == SOK_HAUT){
+        minuscule = true;
+    }
+    return minuscule;
+}
+
+void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile, t_position position){
+    bool caseDouble = false;
+    int i = 0;
     if(oldCompteurDep != compteurDep){
-        utile[compteurDep] = dep[compteur];
+        utile[compteurDep - 1] = dep[compteur];
+        while(!caseDouble && detection_minuscule(utile[i]) && i <= compteurDep - 1){
+
+        }
     }
 }
 
