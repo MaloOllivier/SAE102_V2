@@ -55,7 +55,7 @@ bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
 bool detection_minuscule(char lettre);
 void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile);
-void optimization(typeDeplacements utile, int compteurDep, t_position positions);
+void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS]);
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]);
 
 
@@ -117,6 +117,7 @@ int main(){
             printf("| x:%d y:%d ",positions[i].x,positions[i].y);
         }
         printf("\n");
+       //optimization(utile, compteurDep, positions);
     }
     else{
         printf("---------------------------------------------------------------------------------------------------------------\n");
@@ -360,29 +361,28 @@ bool detection_minuscule(char lettre){
 }
 
 void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile){
-    int i = 0;
     if(oldCompteurDep != compteurDep){
-        utile[compteurDep - 1] = dep[compteur];
+        utile[compteurDep] = dep[compteur];
     }
 }
 
-void optimization(typeDeplacements utile, int compteurDep, t_position positions){
+void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS]){
     bool caseDouble = false;
+    int i = 0;
     while(!caseDouble && detection_minuscule(utile[i]) && i <= compteurDep - 1){
-        if(position[compteurDep - 1].x == position[i].x){
-            if(position[compteurDep - 1].y == position[i].y){
+        printf("| x:%d y:%d ",positions[i].x,positions[i].y);
+        if(positions[compteurDep - 1].x == positions[i].x && positions[compteurDep - 1].y == positions[i].y){
+                while(1){
+                    printf("ben\n");
+                }
                 caseDouble = true;
             }
         }
-        else{
-            i++;
-        }
+        i++;
         if(caseDouble){
             
         }
     }
-} 
-
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]){
     FILE * f;
 
