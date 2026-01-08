@@ -15,6 +15,7 @@
 
 // definition des tableaux
 typedef char t_Plateau[TAILLE][TAILLE];
+typedef int t_tabInt[NB_DEPLACEMENTS];
 typedef char typeDeplacements[NB_DEPLACEMENTS];
 typedef struct{
     int x;
@@ -53,7 +54,8 @@ bool gagne(t_Plateau plateau, t_Plateau niveau);
 bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int compteur);
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
 bool detection_minuscule(char lettre);
-void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile, t_position position);
+void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile);
+void optimization(typeDeplacements utile, int compteurDep, t_position positions);
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]);
 
 
@@ -66,6 +68,7 @@ int main(){
     char nomNiveau[30], nomDeplacement[30];
     int compteur, compteurDep, nbDep, oldCompteurDep;
     int sokobanX, sokobanY;
+    t_tabInt indiceOpti;
     typeDeplacements deplacements;
     typeDeplacements utile;
 
@@ -96,9 +99,9 @@ int main(){
         oldCompteurDep = compteur;
         deplacer(deplacements, plateau, sokobanX, sokobanY, &compteur, depPossible, &compteurDep); // deplace sokoban
         detection_sokoban(plateau, &sokobanX, &sokobanY); // coordonnées de sokoban
-        positions[compteurDep].x = sokobanX;
-        positions[compteurDep].y = sokobanY;
-        detection_utile(deplacements, compteur, compteurDep, oldCompteurDep, utile, positions);
+        positions[compteurDep - 1].x = sokobanX;
+        positions[compteurDep - 1].y = sokobanY;
+        detection_utile(deplacements, compteur, compteurDep, oldCompteurDep, utile);
         enregistrer_deplacements(utile, compteurDep, "FICH");
         system("clear");
         affiche_entete(nomNiveau, compteurDep);
@@ -110,6 +113,10 @@ int main(){
         printf("La suite de déplacement \"%s\" est bien une solution pour la partie \"%s\".\n\n", nomDeplacement, nomNiveau);
         printf("Elle contient %d déplacements.\n", compteurDep);
         printf("---------------------------------------------------------------------------------------------------------------\n");
+        for(int i = 0; i <= compteurDep - 1; i++){
+            printf("| x:%d y:%d ",positions[i].x,positions[i].y);
+        }
+        printf("\n");
     }
     else{
         printf("---------------------------------------------------------------------------------------------------------------\n");
@@ -352,16 +359,29 @@ bool detection_minuscule(char lettre){
     return minuscule;
 }
 
-void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile, t_position position){
-    bool caseDouble = false;
+void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile){
     int i = 0;
     if(oldCompteurDep != compteurDep){
         utile[compteurDep - 1] = dep[compteur];
-        while(!caseDouble && detection_minuscule(utile[i]) && i <= compteurDep - 1){
-
-        }
     }
 }
+
+void optimization(typeDeplacements utile, int compteurDep, t_position positions){
+    bool caseDouble = false;
+    while(!caseDouble && detection_minuscule(utile[i]) && i <= compteurDep - 1){
+        if(position[compteurDep - 1].x == position[i].x){
+            if(position[compteurDep - 1].y == position[i].y){
+                caseDouble = true;
+            }
+        }
+        else{
+            i++;
+        }
+        if(caseDouble){
+            
+        }
+    }
+} 
 
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]){
     FILE * f;
