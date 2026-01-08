@@ -117,7 +117,7 @@ int main(){
             printf("| x:%d y:%d ",positions[i].x,positions[i].y);
         }
         printf("\n");
-       //optimization(utile, compteurDep, positions);
+       optimization(utile, compteurDep, positions);
     }
     else{
         printf("---------------------------------------------------------------------------------------------------------------\n");
@@ -369,20 +369,25 @@ void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int ol
 void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS]){
     bool caseDouble = false;
     int i = 0;
+        
     while(!caseDouble && detection_minuscule(utile[i]) && i <= compteurDep - 1){
-        printf("| x:%d y:%d ",positions[i].x,positions[i].y);
-        if(positions[compteurDep - 1].x == positions[i].x && positions[compteurDep - 1].y == positions[i].y){
+        i++;
+        printf("i : %d\n",i);
+        
+        printf("salut x:%d y:%d \n",positions[i].x,positions[i].y);
+        if(positions[compteurDep].x == positions[i].x && positions[compteurDep].y == positions[i].y){
                 while(1){
                     printf("ben\n");
                 }
                 caseDouble = true;
             }
         }
-        i++;
+        
         if(caseDouble){
             
         }
-    }
+}
+
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]){
     FILE * f;
 
