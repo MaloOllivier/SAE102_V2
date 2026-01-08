@@ -16,7 +16,10 @@
 // definition des tableaux
 typedef char t_Plateau[TAILLE][TAILLE];
 typedef char typeDeplacements[NB_DEPLACEMENTS];
-
+typedef struct{
+    int x;
+    int y;
+} t_position;
 // definition des char a enregistrer / afficher
 const char SOKOBAN[1] = "@";
 const char CAISSES[1] = "$";
@@ -33,10 +36,9 @@ const char SOK_HAUT = 'h';
 const char CAISSE_HAUT = 'H';
 const char SOK_BAS = 'b';
 const char CAISSE_BAS = 'B';
-//5
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 200000;
+const int DUREE_PAUSE = 4;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -50,16 +52,21 @@ void detection_sokoban(t_Plateau plateau, int *AdrX, int *AdrY);
 bool gagne(t_Plateau plateau, t_Plateau niveau);
 bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int compteur);
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
+void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile);
+void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]);
 
 
 int main(){
     //declaration des variables
+    t_position positions[NB_DEPLACEMENTS];
     bool victoire = false, depPossible;
     t_Plateau plateau, niveau;
     char nomNiveau[30], nomDeplacement[30];
-    int compteur, compteurDep, nbDep;
+    int compteur, compteurDep, nbDep, oldCompteurDep;
     int sokobanX, sokobanY;
     typeDeplacements deplacements;
+    typeDeplacements utile;
+
     lecture_niveau(nomNiveau);
     charger_partie(niveau, nomNiveau);
 
@@ -67,6 +74,7 @@ int main(){
     // remise a 0
     compteur = 0;
     compteurDep = 0;
+    oldCompteurDep = 0;
 
     // initialisation
     charger_partie(plateau, nomNiveau);
@@ -76,17 +84,20 @@ int main(){
     printf("nbDep : %d\n",nbDep);
     system("clear");
     affiche_entete(nomNiveau, compteurDep);
-    afficher_plateau(plateau, niveau);
+    //afficher_plateau(plateau, niveau);
 
     while (compteur < nbDep){ 
         usleep(DUREE_PAUSE); // pause entre chaque mouvement
         detection_sokoban(plateau, &sokobanX, &sokobanY); // coordonnées de sokoban
         depPossible = false; // remets la verification de deplacement a false
         depPossible = deplacement_possible(deplacements, plateau, sokobanX, sokobanY, compteur); // verifie que le prochain deplacement est possible
+        oldCompteurDep = compteur;
         deplacer(deplacements, plateau, sokobanX, sokobanY, &compteur, depPossible, &compteurDep); // deplace sokoban
+        detection_utile(deplacements, compteur, compteurDep, oldCompteurDep, utile);
+        enregistrer_deplacements(utile, compteurDep, "FICH");
         system("clear");
         affiche_entete(nomNiveau, compteurDep);
-        afficher_plateau(plateau, niveau);
+        //afficher_plateau(plateau, niveau);
     }
     victoire = gagne(plateau, niveau);
     if (victoire == true){ // si la partie est gagné
@@ -100,6 +111,7 @@ int main(){
         printf("La suite de déplacements \"%s\" N’EST PAS une solution pour la partie \"%s\" .\n", nomDeplacement, nomNiveau);
         printf("---------------------------------------------------------------------------------------------------------------\n");
     }
+
     return EXIT_SUCCESS;
 }
 void lecture_niveau(char niveau[]){
@@ -113,7 +125,7 @@ void charger_partie(t_Plateau plateau, char fichier[]){
 
     f = fopen(fichier, "r");
     if (f == NULL){
-        printf("ERREUR SUR FICHIER\n");
+        printf("ERREUR SUR FICHIER");
         exit(EXIT_FAILURE);
     }
     else{
@@ -321,5 +333,19 @@ void chargerDeplacements(typeDeplacements t, char fichier[], int * nb){
             }
         }
     }
+    fclose(f);
+}
+
+void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile){
+    if(oldCompteurDep != compteurDep){
+        utile[compteurDep] = dep[compteur];
+    }
+}
+
+void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]){
+    FILE * f;
+
+    f = fopen(fic, "w");
+    fwrite(t,sizeof(char), nb, f);
     fclose(f);
 }
