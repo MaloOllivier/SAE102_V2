@@ -387,11 +387,14 @@ void optimization(typeDeplacements utile, int compteurDep, t_position positions[
             depart = i;
             printf("i : %d  dep : %c\n",i,utile[i]);
         }
-        i++;
         if(caseDouble){
-            
+            utile[i] = 'X';
         }
         caseDouble = false;
+        i++;
+    }
+    for(int k = 0; k <= compteurDep - 1; k++){
+        printf("%c |",utile[k]);
     }
 }
 
