@@ -40,7 +40,7 @@ const char CAISSE_BAS = 'B';
 const char DEP_VIDE = 'X';
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 400;
+const int DUREE_PAUSE = 40;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -370,9 +370,9 @@ void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int ol
 void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti){
     bool caseDouble;
     int depart = 0;
-    int i = 0;
-    int j;
-    int k;
+    int i = 0; // position dans dep
+    int j; // derniere position valide
+    int k = 0; // position de suppression
 
     while(i < compteurDep){
         caseDouble = false;
@@ -383,7 +383,8 @@ void optimization(typeDeplacements utile, int compteurDep, t_position positions[
             j = depart;
             while(j < i && !caseDouble){
                 if(positions[j].x == positions[i].x && positions[j].y == positions[i].y){
-                    for(int k = j + 1; k <= i; k++){
+                    k = j + 1;
+                    while (k <= i){
                         utile[k] = DEP_VIDE;
                         k++;
                     }
