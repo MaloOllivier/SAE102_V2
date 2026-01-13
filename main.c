@@ -40,7 +40,7 @@ const char CAISSE_BAS = 'B';
 const char DEP_VIDE = 'X';
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 40000;
+const int DUREE_PAUSE = 400;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -97,7 +97,7 @@ int main(){
         detection_sokoban(plateau, &sokobanX, &sokobanY); // coordonnées de sokoban
         depPossible = false; // remets la verification de deplacement a false
         depPossible = deplacement_possible(deplacements, plateau, sokobanX, sokobanY, compteur); // verifie que le prochain deplacement est possible
-        oldCompteurDep = compteur;
+        oldCompteurDep = compteurDep;
         deplacer(deplacements, plateau, sokobanX, sokobanY, &compteur, depPossible, &compteurDep); // deplace sokoban
         detection_sokoban(plateau, &sokobanX, &sokobanY); // coordonnées de sokoban
         positions[compteurDep - 1].x = sokobanX;
@@ -366,44 +366,48 @@ void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int ol
     }
 }
 
-void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti){
-    bool caseDouble = false;
-    int i = 0;
-    int depart = 0;
-    int j = 0;
-    *nbDepOpti = 0;
-    while( i <= compteurDep - 1){
-        //printf("i : %d\n",i);
-        //printf("salut x:%d y:%d \n",positions[i].x,positions[i].y);
-        j = depart;
-        while(j < i && detection_minuscule(utile[i]) && !caseDouble){
-            if(positions[j].x == positions[i].x && positions[j].y == positions[i].y){
-                caseDouble = true;
-                printf("ben i : %d\n",i);
-            }
-            j++;
 
-        }
-        if(!detection_minuscule(utile[i])){
-            depart = i;
-            printf("i : %d  dep : %c\n",i,utile[i]);
-        }
-        if(caseDouble){
-            utile[i] = DEP_VIDE;
-        }
+void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti){
+    bool caseDouble;
+    int depart = 0;
+    int i = 0;
+    int j;
+    int k;
+
+    while(i < compteurDep){
         caseDouble = false;
+
+        if(!detection_minuscule(utile[i])){
+            depart = i + 1;
+        } else {
+            j = depart;
+            while(j < i && !caseDouble){
+                if(positions[j].x == positions[i].x && positions[j].y == positions[i].y){
+                    for(int k = j + 1; k <= i; k++){
+                        utile[k] = DEP_VIDE;
+                        k++;
+                    }
+                    depart = i + 1;
+                    caseDouble = true;
+                }
+                j++;
+            }
+        }
         i++;
     }
-    for(int k = 0; k <= compteurDep - 1; k++){
-        if (utile[k] != DEP_VIDE){
-            optimize[(*nbDepOpti)] = utile[k];
+
+    *nbDepOpti = 0;
+    i = 0;
+    while(i < compteurDep){
+        if(utile[i] != DEP_VIDE){
+            optimize[*nbDepOpti] = utile[i];
             (*nbDepOpti)++;
         }
-        printf("%c |",utile[k]);
+        i++;
     }
-    printf("\n");
-    
 }
+
+
 
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]){
     FILE * f;
