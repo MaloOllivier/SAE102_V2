@@ -39,7 +39,7 @@ const char SOK_BAS = 'b';
 const char CAISSE_BAS = 'B';
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 4;
+const int DUREE_PAUSE = 40;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -89,7 +89,7 @@ int main(){
     printf("nbDep : %d\n",nbDep);
     system("clear");
     affiche_entete(nomNiveau, compteurDep);
-    //afficher_plateau(plateau, niveau);
+    afficher_plateau(plateau, niveau);
 
     while (compteur < nbDep){ 
         usleep(DUREE_PAUSE); // pause entre chaque mouvement
@@ -105,7 +105,7 @@ int main(){
         enregistrer_deplacements(utile, compteurDep, "FICH");
         system("clear");
         affiche_entete(nomNiveau, compteurDep);
-        //afficher_plateau(plateau, niveau);
+        afficher_plateau(plateau, niveau);
     }
     victoire = gagne(plateau, niveau);
     if (victoire == true){ // si la partie est gagné
@@ -362,7 +362,7 @@ bool detection_minuscule(char lettre){
 
 void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile){
     if(oldCompteurDep != compteurDep){
-        utile[compteurDep] = dep[compteur];
+        utile[compteurDep - 1] = dep[compteur];
     }
 }
 
@@ -372,27 +372,26 @@ void optimization(typeDeplacements utile, int compteurDep, t_position positions[
     int depart = 0;
     int j = 0;
     while( i <= compteurDep - 1){
-        printf("i : %d\n",i);
-        
-        printf("salut x:%d y:%d \n",positions[i].x,positions[i].y);
+        //printf("i : %d\n",i);
+        //printf("salut x:%d y:%d \n",positions[i].x,positions[i].y);
+        j = depart;
         while(j < i && !detection_minuscule(utile[i]) && !caseDouble){
-            j = 0;
-            if(j !=0){
-                j = i;
-            }
             if(positions[j].x == positions[i].x && positions[j].y == positions[i].y){
                 caseDouble = true;
                 printf("ben\n");
             }
             j++;
+
+        }
+        if(!detection_minuscule(utile[i])){
+            depart = i;
+            printf("i : %d  dep : %c\n",i,utile[i]);
         }
         i++;
         if(caseDouble){
             
         }
-        if(!detection_minuscule(utile[i])){
-            depart = i;
-        }
+        caseDouble = false;
     }
 }
 
