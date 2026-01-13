@@ -37,9 +37,10 @@ const char SOK_HAUT = 'h';
 const char CAISSE_HAUT = 'H';
 const char SOK_BAS = 'b';
 const char CAISSE_BAS = 'B';
+const char DEP_VIDE = 'X';
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 40;
+const int DUREE_PAUSE = 40000;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -55,7 +56,7 @@ bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
 bool detection_minuscule(char lettre);
 void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile);
-void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS]);
+void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti);
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]);
 
 
@@ -66,10 +67,10 @@ int main(){
     bool victoire = false, depPossible;
     t_Plateau plateau, niveau;
     char nomNiveau[30], nomDeplacement[30];
-    int compteur, compteurDep, nbDep, oldCompteurDep;
+    int compteur, compteurDep, nbDep, oldCompteurDep, nbDepOpti;
     int sokobanX, sokobanY;
     t_tabInt indiceOpti;
-    typeDeplacements deplacements;
+    typeDeplacements deplacements, optimize;
     typeDeplacements utile;
 
     lecture_niveau(nomNiveau);
@@ -117,7 +118,8 @@ int main(){
             printf("| x:%d y:%d ",positions[i].x,positions[i].y);
         }
         printf("\n");
-       optimization(utile, compteurDep, positions);
+        optimization(utile, compteurDep, positions, optimize, &nbDepOpti);
+        enregistrer_deplacements(optimize, nbDepOpti, "OPTI");
     }
     else{
         printf("---------------------------------------------------------------------------------------------------------------\n");
@@ -127,6 +129,7 @@ int main(){
 
     return EXIT_SUCCESS;
 }
+
 void lecture_niveau(char niveau[]){
     printf("nom du fichier .sok : ");
     scanf("%s", niveau);
@@ -221,8 +224,6 @@ bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x
     return possible;
 }
 
-
-
 void deplacer(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int *compteur, bool possible, int *compteurDep){
     int i = *compteur;
     if(deplacement[i] == SOK_BAS && plateau[x + 1][y] != CAISSES[0]){ // si le deplacement et un sokoban simple est qu'il n'y a pas de caisses derriere
@@ -287,7 +288,6 @@ void deplacer(typeDeplacements deplacement, t_Plateau plateau, int x, int y, int
     }
     (*compteur)++;
 }
-
 
 void detection_sokoban(t_Plateau plateau, int *AdrX, int *AdrY){
     int x, y;
@@ -366,11 +366,12 @@ void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int ol
     }
 }
 
-void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS]){
+void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti){
     bool caseDouble = false;
     int i = 0;
     int depart = 0;
     int j = 0;
+    *nbDepOpti = 0;
     while( i <= compteurDep - 1){
         //printf("i : %d\n",i);
         //printf("salut x:%d y:%d \n",positions[i].x,positions[i].y);
@@ -388,14 +389,20 @@ void optimization(typeDeplacements utile, int compteurDep, t_position positions[
             printf("i : %d  dep : %c\n",i,utile[i]);
         }
         if(caseDouble){
-            utile[i] = 'X';
+            utile[i] = DEP_VIDE;
         }
         caseDouble = false;
         i++;
     }
     for(int k = 0; k <= compteurDep - 1; k++){
+        if (utile[k] != DEP_VIDE){
+            optimize[(*nbDepOpti)] = utile[k];
+            (*nbDepOpti)++;
+        }
         printf("%c |",utile[k]);
     }
+    printf("\n");
+    
 }
 
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]){
