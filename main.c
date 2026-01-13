@@ -375,10 +375,10 @@ void optimization(typeDeplacements utile, int compteurDep, t_position positions[
         //printf("i : %d\n",i);
         //printf("salut x:%d y:%d \n",positions[i].x,positions[i].y);
         j = depart;
-        while(j < i && !detection_minuscule(utile[i]) && !caseDouble){
+        while(j < i && detection_minuscule(utile[i]) && !caseDouble){
             if(positions[j].x == positions[i].x && positions[j].y == positions[i].y){
                 caseDouble = true;
-                printf("ben\n");
+                printf("ben i : %d\n",i);
             }
             j++;
 
