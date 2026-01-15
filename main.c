@@ -368,6 +368,8 @@ void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int ol
 
 
 void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti){
+    // tant que case double ... puis supr tout quand plus casedouble tacapté
+    
     bool caseDouble;
     int depart = 0;
     int i = 0; // position dans dep
