@@ -15,7 +15,6 @@
 
 // definition des tableaux
 typedef char t_Plateau[TAILLE][TAILLE];
-typedef int t_tabInt[NB_DEPLACEMENTS];
 typedef char typeDeplacements[NB_DEPLACEMENTS];
 typedef struct{
     int x;
@@ -40,7 +39,7 @@ const char CAISSE_BAS = 'B';
 const char DEP_VIDE = 'X';
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 4000;
+const int DUREE_PAUSE = 90000;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -69,7 +68,6 @@ int main(){
     char nomNiveau[30], nomDeplacement[30];
     int compteur, compteurDep, nbDep, oldCompteurDep, nbDepOpti;
     int sokobanX, sokobanY;
-    t_tabInt indiceOpti;
     typeDeplacements deplacements, optimize;
     typeDeplacements utile;
 
@@ -110,15 +108,15 @@ int main(){
     }
     victoire = gagne(plateau, niveau);
     if (victoire == true){ // si la partie est gagné
+        optimisation(utile, compteurDep, positions, optimize, &nbDepOpti);
         printf("---------------------------------------------------------------------------------------------------------------\n");
         printf("La suite de déplacement \"%s\" est bien une solution pour la partie \"%s\".\n\n", nomDeplacement, nomNiveau);
-        printf("Elle contient %d déplacements.\n", compteurDep);
+        printf("Elle contient initialement %d déplacements.\n", compteurDep);
+        printf("Après optimisation elle contient %d déplacements.\n", nbDepOpti);
+        printf("Voulez-vous l’enregistrer (O/N) ? OcompteurDep\n");
         printf("---------------------------------------------------------------------------------------------------------------\n");
-        for(int i = 0; i <= compteurDep - 1; i++){
-            printf("| x:%d y:%d ",positions[i].x,positions[i].y);
-        }
         printf("\n");
-        optimisation(utile, compteurDep, positions, optimize, &nbDepOpti);
+        
         enregistrer_deplacements(optimize, nbDepOpti, "OPTI");
     }
     else{
@@ -366,13 +364,12 @@ void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int ol
     }
 }
 
-
 void optimisation(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti) {
     bool changement = true;
     bool boucle;
     int nbDep = compteurDep;
 
-    while (changement) {
+    while (changement) { // tant qu'on arrive a optimiser la suite de deplacements
         int i, j;
         int depart;
         changement = false;
