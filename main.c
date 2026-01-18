@@ -39,7 +39,7 @@ const char CAISSE_BAS = 'B';
 const char DEP_VIDE = 'X';
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 90000;
+const int DUREE_PAUSE = 900;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -111,13 +111,21 @@ int main(){
         optimisation(utile, compteurDep, positions, optimize, &nbDepOpti);
         printf("---------------------------------------------------------------------------------------------------------------\n");
         printf("La suite de déplacement \"%s\" est bien une solution pour la partie \"%s\".\n\n", nomDeplacement, nomNiveau);
-        printf("Elle contient initialement %d déplacements.\n", compteurDep);
-        printf("Après optimisation elle contient %d déplacements.\n", nbDepOpti);
-        printf("Voulez-vous l’enregistrer (O/N) ? OcompteurDep\n");
+        printf("Elle contient initialement %d caractères.\n", compteur);
+        printf("Après optimisation elle contient %d caractères.\n", nbDepOpti);
         printf("---------------------------------------------------------------------------------------------------------------\n");
         printf("\n");
+        printf("Voulez-vous l’enregistrer (O/N) ? ");
+        char reponse;
+        scanf(" %c", &reponse);
+        if (reponse == 'O'){
+            char nomFichierDep[30];
+            printf("nom du fichier (a la fin ajoutez \".dep\"): ");
+            scanf("%s", nomFichierDep);
+            enregistrer_deplacements(optimize, nbDepOpti, nomFichierDep);
+        }
+        printf("Au revoir...\n");
         
-        enregistrer_deplacements(optimize, nbDepOpti, "OPTI");
     }
     else{
         printf("---------------------------------------------------------------------------------------------------------------\n");
