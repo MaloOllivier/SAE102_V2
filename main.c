@@ -40,7 +40,7 @@ const char CAISSE_BAS = 'B';
 const char DEP_VIDE = 'X';
 
 // temps entre chaque deplacements
-const int DUREE_PAUSE = 40;
+const int DUREE_PAUSE = 4000;
 
 // prototypes de toutes les fonctions / procedures
 void lecture_niveau(char niveau[]);
@@ -56,7 +56,7 @@ bool deplacement_possible(typeDeplacements deplacement, t_Plateau plateau, int x
 void chargerDeplacements(typeDeplacements t, char fichier[], int * nb);
 bool detection_minuscule(char lettre);
 void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile);
-void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti);
+void optimisation(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti);
 void enregistrer_deplacements(typeDeplacements t, int nb, char fic[]);
 
 
@@ -118,7 +118,7 @@ int main(){
             printf("| x:%d y:%d ",positions[i].x,positions[i].y);
         }
         printf("\n");
-        optimization(utile, compteurDep, positions, optimize, &nbDepOpti);
+        optimisation(utile, compteurDep, positions, optimize, &nbDepOpti);
         enregistrer_deplacements(optimize, nbDepOpti, "OPTI");
     }
     else{
@@ -367,45 +367,63 @@ void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int ol
 }
 
 
-void optimization(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti){
-    // tant que case double ... puis supr tout quand plus casedouble tacapté
-    
-    bool caseDouble;
-    int depart = 0;
-    int i = 0; // position dans dep
-    int j; // derniere position valide
-    int k = 0; // position de suppression
+void optimisation(typeDeplacements utile, int compteurDep, t_position positions[NB_DEPLACEMENTS], typeDeplacements optimize, int *nbDepOpti) {
+    bool changement = true;
+    bool boucle;
+    int nbDep = compteurDep;
 
-    while(i < compteurDep){
-        caseDouble = false;
+    while (changement) {
+        int i, j;
+        int depart;
+        changement = false;
+        i = 0;
+        depart = 0;
 
-        if(!detection_minuscule(utile[i])){
-            depart = i + 1;
-        } else {
-            j = depart;
-            while(j < i && !caseDouble){
-                if(positions[j].x == positions[i].x && positions[j].y == positions[i].y){
-                    k = j + 1;
-                    while (k <= i){
-                        utile[k] = DEP_VIDE;
-                        k++;
+        while (i < nbDep) {
+            if (!detection_minuscule(utile[i])) { // detection de caisse bougée
+                depart = i + 1; // on mets le depart de la recherche a la position d'après
+            } else { // si c'est un deplacement simple
+                j = depart; // on mets j a la position départ
+                boucle = false; // on mets la detection de boucle sur faux
+                
+                while (j < i && !boucle) { // recherche de sequences inutile entre le depart et la position actuelle
+                    if (positions[j].x == positions[i].x && positions[j].y == positions[i].y) { // detection de case identique
+                        boucle = true; // une boucle a été detecté
+                        changement = true; // on remets changement, la boucle continuera
+                        
+                        int k = j + 1;
+                        while (k <= i) { // On marque tout ce qui est entre j+1 et i comme vide
+                            utile[k] = DEP_VIDE;
+                            k++;
+                        }
+                        depart = i + 1; 
                     }
-                    depart = i + 1;
-                    caseDouble = true;
+                    j++;
+                }
+            }
+            i++;
+        }
+
+        if (changement) { // si il ya eu un changement dans la suite de dep
+            int i = 0; // nouveau tab
+            int j = 0; // vieux tab
+            while (j < nbDep) { // on parcour le tableau avec les DEP_VIDE
+                if (utile[j] != DEP_VIDE) { // si a la position de j il ya un deplacement
+                    utile[i] = utile[j]; // on met a jour notre tableau (sans les dep inutiles)
+                    positions[i] = positions[j]; // on met a jour le tableau des positions (sans les positions inutiles)
+                    i++;
                 }
                 j++;
             }
+            nbDep = i; // le nombre de deplacements apres la suppression des DEP_VIDE
         }
-        i++;
     }
 
-    *nbDepOpti = 0;
-    i = 0;
-    while(i < compteurDep){
-        if(utile[i] != DEP_VIDE){
-            optimize[*nbDepOpti] = utile[i];
-            (*nbDepOpti)++;
-        }
+    // on mets notre optimisation ndans un tableau different
+    *nbDepOpti = nbDep;
+    int i = 0;
+    while (i < nbDep) {
+        optimize[i] = utile[i];
         i++;
     }
 }
