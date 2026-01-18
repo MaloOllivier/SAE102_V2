@@ -1,4 +1,3 @@
-// gcc main.c -Wall -o main.out && ./main.out < testuni
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -114,7 +113,7 @@ int main(){
         printf("Après optimisation elle contient %d caractères.\n", nbDepOpti);
         printf("---------------------------------------------------------------------------------------------------------------\n");
         printf("\n");
-        printf("Voulez-vous l’enregistrer (O/N) ? ");
+        printf("Voulez-vous enregistrer la version optimisee(O/N) ? ");
         char reponse;
         scanf(" %c", &reponse);
         if (reponse == 'O'){
@@ -124,7 +123,7 @@ int main(){
             enregistrer_deplacements(optimize, nbDepOpti, nomFichierDep);
         }
         printf("Au revoir...\n");
-        
+        printf("---------------------------------------------------------------------------------------------------------------\n");
     }
     else{
         printf("---------------------------------------------------------------------------------------------------------------\n");
