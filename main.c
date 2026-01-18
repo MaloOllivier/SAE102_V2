@@ -101,7 +101,6 @@ int main(){
         positions[compteurDep - 1].x = sokobanX;
         positions[compteurDep - 1].y = sokobanY;
         detection_utile(deplacements, compteur, compteurDep, oldCompteurDep, utile);
-        enregistrer_deplacements(utile, compteurDep, "FICH");
         system("clear");
         affiche_entete(nomNiveau, compteurDep);
         afficher_plateau(plateau, niveau);
