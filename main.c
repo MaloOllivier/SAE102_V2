@@ -367,7 +367,7 @@ bool detection_minuscule(char lettre){
 }
 
 void detection_utile(typeDeplacements dep, int compteur, int compteurDep, int oldCompteurDep, typeDeplacements utile){
-    if(oldCompteurDep != compteurDep){
+    if(oldCompteurDep != compteurDep){ // si le dernier deplacement na pas fonctionner, on le supprime
         utile[compteurDep - 1] = dep[compteur - 1];
     }
 }
